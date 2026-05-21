@@ -1,0 +1,441 @@
+{% extends 'hotel_app/base.html' %}
+{% load static %}
+
+{% block title %}{{ config.nombre_hotel }} — Inicio{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ── HERO ── */
+    .hero {
+        position: relative;
+        height: 100vh;
+        min-height: 600px;
+        display: flex; align-items: center; justify-content: center;
+        text-align: center;
+        overflow: hidden;
+    }
+
+    .hero-bg {
+        position: absolute; inset: 0;
+        background: linear-gradient(135deg, #0a0a0a 0%, #1a1209 40%, #0a0a0a 100%);
+    }
+
+    /* Animated gold shimmer overlay */
+    .hero-bg::before {
+        content: '';
+        position: absolute; inset: 0;
+        background:
+            radial-gradient(ellipse 80% 60% at 50% 40%, rgba(201,168,76,0.08) 0%, transparent 70%),
+            radial-gradient(ellipse 40% 30% at 20% 70%, rgba(201,168,76,0.05) 0%, transparent 50%);
+        animation: shimmer 6s ease-in-out infinite alternate;
+    }
+
+    @keyframes shimmer {
+        from { opacity: 0.5; }
+        to { opacity: 1; }
+    }
+
+    /* Decorative lines */
+    .hero-bg::after {
+        content: '';
+        position: absolute; inset: 0;
+        background-image:
+            linear-gradient(rgba(201,168,76,0.04) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(201,168,76,0.04) 1px, transparent 1px);
+        background-size: 60px 60px;
+    }
+
+    .hero-content {
+        position: relative; z-index: 1;
+        padding: 0 5%;
+        max-width: 800px;
+    }
+
+    .hero-eyebrow {
+        font-size: 0.7rem;
+        letter-spacing: 0.45em;
+        text-transform: uppercase;
+        color: var(--gold);
+        margin-bottom: 1.5rem;
+        display: block;
+        animation: fadeUp 0.8s ease both;
+    }
+
+    .hero-title {
+        font-family: 'Playfair Display', serif;
+        font-size: clamp(2.5rem, 7vw, 5.5rem);
+        line-height: 1.1;
+        color: var(--white);
+        margin-bottom: 1.5rem;
+        animation: fadeUp 0.8s 0.15s ease both;
+    }
+
+    .hero-title em {
+        color: var(--gold);
+        font-style: italic;
+    }
+
+    .hero-subtitle {
+        font-size: clamp(0.9rem, 1.5vw, 1.1rem);
+        color: var(--text-muted);
+        margin-bottom: 2.5rem;
+        line-height: 1.7;
+        animation: fadeUp 0.8s 0.3s ease both;
+    }
+
+    .hero-actions {
+        display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;
+        animation: fadeUp 0.8s 0.45s ease both;
+    }
+
+    @keyframes fadeUp {
+        from { opacity: 0; transform: translateY(25px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .hero-scroll {
+        position: absolute; bottom: 2rem; left: 50%;
+        transform: translateX(-50%);
+        display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
+        color: var(--text-muted); font-size: 0.65rem; letter-spacing: 0.2em;
+        text-transform: uppercase; z-index: 1;
+        animation: bounce 2s ease-in-out infinite;
+    }
+
+    @keyframes bounce {
+        0%, 100% { transform: translateX(-50%) translateY(0); }
+        50% { transform: translateX(-50%) translateY(6px); }
+    }
+
+    /* ── STATS BAR ── */
+    .stats-bar {
+        background: var(--dark2);
+        border-top: 1px solid var(--border);
+        border-bottom: 1px solid var(--border);
+        padding: 2rem 5%;
+        display: flex;
+        justify-content: center;
+        gap: 0;
+    }
+
+    .stat-item {
+        text-align: center;
+        padding: 0 3rem;
+        border-right: 1px solid var(--border);
+    }
+
+    .stat-item:last-child { border-right: none; }
+
+    .stat-number {
+        font-family: 'Playfair Display', serif;
+        font-size: 2rem;
+        color: var(--gold);
+        display: block;
+    }
+
+    .stat-label {
+        font-size: 0.7rem;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        margin-top: 0.3rem;
+    }
+
+    /* ── SECTION ── */
+    .section {
+        padding: 6rem 5%;
+    }
+
+    .section-alt { background: var(--dark2); }
+
+    /* ── ROOMS GRID ── */
+    .rooms-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 1.5px;
+    }
+
+    .tarjeta-habitacion {
+        position: relative;
+        aspect-ratio: 4/3;
+        overflow: hidden;
+        cursor: pointer;
+        text-decoration: none;
+        display: block;
+        background: var(--dark3);
+    }
+
+    .tarjeta-habitacion-img {
+        width: 100%; height: 100%;
+        object-fit: cover;
+        transition: transform 0.6s ease;
+    }
+
+    .tarjeta-habitacion-placeholder {
+        width: 100%; height: 100%;
+        background: linear-gradient(135deg, #1a1a1a, #2a2010);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 4rem;
+        transition: transform 0.6s ease;
+    }
+
+    .tarjeta-habitacion:hover .tarjeta-habitacion-img,
+    .tarjeta-habitacion:hover .tarjeta-habitacion-placeholder {
+        transform: scale(1.06);
+    }
+
+    .tarjeta-habitacion-overlay {
+        position: absolute; inset: 0;
+        background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 50%);
+        display: flex; flex-direction: column;
+        justify-content: flex-end;
+        padding: 1.5rem;
+        transition: background 0.4s;
+    }
+
+    .tarjeta-habitacion:hover .tarjeta-habitacion-overlay {
+        background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.2) 60%);
+    }
+
+    .tarjeta-habitacion-tag {
+        position: absolute; top: 1rem; left: 1rem;
+        background: var(--gold);
+        color: var(--dark);
+        font-size: 0.6rem;
+        font-weight: 700;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        padding: 0.3rem 0.7rem;
+    }
+
+    .tarjeta-habitacion-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.3rem;
+        color: var(--white);
+        margin-bottom: 0.3rem;
+    }
+
+    .tarjeta-habitacion-price {
+        color: var(--gold);
+        font-size: 0.85rem;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+    }
+
+    .tarjeta-habitacion-cta {
+        display: inline-block;
+        margin-top: 0.7rem;
+        font-size: 0.65rem;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--gold);
+        opacity: 0;
+        transform: translateY(8px);
+        transition: all 0.3s;
+    }
+
+    .tarjeta-habitacion:hover .tarjeta-habitacion-cta {
+        opacity: 1; transform: translateY(0);
+    }
+
+    /* ── SERVICES ── */
+    .services-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 2rem;
+    }
+
+    .service-card {
+        border: 1px solid var(--border);
+        padding: 2rem 1.5rem;
+        text-align: center;
+        transition: all 0.3s;
+        background: var(--dark);
+    }
+
+    .service-card:hover {
+        border-color: var(--gold);
+        transform: translateY(-4px);
+        box-shadow: 0 10px 30px rgba(201,168,76,0.1);
+    }
+
+    .service-icon {
+        font-size: 2.5rem;
+        display: block;
+        margin-bottom: 1rem;
+    }
+
+    .service-name {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.1rem;
+        color: var(--white);
+        margin-bottom: 0.7rem;
+    }
+
+    .service-desc {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        line-height: 1.6;
+    }
+
+    /* ── CTA BANNER ── */
+    .cta-banner {
+        padding: 6rem 5%;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+        background: linear-gradient(135deg, #100d05, #1c1508, #100d05);
+    }
+
+    .cta-banner::before {
+        content: '';
+        position: absolute; inset: 0;
+        background: radial-gradient(ellipse 70% 60% at 50% 50%, rgba(201,168,76,0.12) 0%, transparent 70%);
+    }
+
+    .cta-banner-content { position: relative; z-index: 1; }
+
+    .cta-banner .section-title { font-size: clamp(2rem, 4vw, 3.5rem); }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .stats-bar { flex-wrap: wrap; gap: 1.5rem; }
+        .stat-item { border-right: none; padding: 0 1.5rem; }
+        .rooms-grid { grid-template-columns: 1fr; gap: 1px; }
+        .hero-actions { flex-direction: column; align-items: center; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- ── HERO ── -->
+<section class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-content">
+        <span class="hero-eyebrow">✦ Bienvenido a {{ config.nombre_hotel }} ✦</span>
+        <h1 class="hero-title">
+            Donde el lujo<br>
+            <em>se encuentra</em><br>
+            con el confort
+        </h1>
+        <p class="hero-subtitle">
+            {{ config.slogan|default:"Disfruta de habitaciones exclusivas con el más alto nivel de privacidad y elegancia. Tu descanso merece lo mejor." }}
+        </p>
+        <div class="hero-actions">
+            <a href="{% url 'habitaciones' %}" class="boton-principal boton-principal-fill">Ver Habitaciones</a>
+            {% if config.whatsapp %}
+            <a href="https://wa.me/{{ config.whatsapp }}" target="_blank" class="boton-principal">Reservar Ahora</a>
+            {% endif %}
+        </div>
+    </div>
+    <div class="hero-scroll">
+        <span>Scroll</span>
+        <span style="font-size:1.2rem;">↓</span>
+    </div>
+</section>
+
+<!-- ── STATS ── -->
+<div class="stats-bar">
+    <div class="stat-item">
+        <span class="stat-number">24</span>
+        <span class="stat-label">Horas disponible</span>
+    </div>
+    <div class="stat-item">
+        <span class="stat-number">{{ habitaciones.count }}+</span>
+        <span class="stat-label">Habitaciones</span>
+    </div>
+    <div class="stat-item">
+        <span class="stat-number">100%</span>
+        <span class="stat-label">Privacidad</span>
+    </div>
+    <div class="stat-item">
+        <span class="stat-number">★ 5</span>
+        <span class="stat-label">Estrellas</span>
+    </div>
+</div>
+
+<!-- ── HABITACIONES ── -->
+<section class="section" id="habitaciones">
+    <div class="section-header">
+        <span class="section-label">Nuestras habitaciones</span>
+        <h2 class="section-title">Espacios pensados<br>para ti</h2>
+        <div class="linea-dorada"><span>✦</span></div>
+        <p class="section-subtitle">Cada habitación ha sido diseñada con materiales premium y detalles únicos para garantizar tu comodidad.</p>
+    </div>
+
+    {% if habitaciones %}
+    <div class="rooms-grid">
+        {% for hab in habitaciones %}
+        <a href="{% url 'detalle_habitacion' hab.pk %}" class="tarjeta-habitacion">
+            {% if hab.imagen_principal %}
+            <img src="{{ hab.imagen_principal.url }}" alt="{{ hab.nombre }}" class="tarjeta-habitacion-img">
+            {% else %}
+            <div class="tarjeta-habitacion-placeholder">🛏</div>
+            {% endif %}
+            <div class="tarjeta-habitacion-overlay">
+                <span class="tarjeta-habitacion-tag">{{ hab.get_tipo_display }}</span>
+                <div class="tarjeta-habitacion-title">{{ hab.nombre }}</div>
+                <div class="tarjeta-habitacion-price">
+                    Desde ${{ hab.precio_noche|floatformat:0 }} MXN / noche
+                    {% if hab.precio_hora %} · ${{ hab.precio_hora|floatformat:0 }} MXN / hora{% endif %}
+                </div>
+                <span class="tarjeta-habitacion-cta">Ver detalles →</span>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+
+    <div style="text-align:center;margin-top:3rem;">
+        <a href="{% url 'habitaciones' %}" class="boton-principal">Ver todas las habitaciones</a>
+    </div>
+    {% else %}
+    <div style="text-align:center;padding:4rem;color:var(--text-muted);">
+        <p style="font-family:'Playfair Display',serif;font-size:1.2rem;">Próximamente disponibles</p>
+        <p style="margin-top:0.5rem;font-size:0.85rem;">Estamos preparando nuestras habitaciones para ti.</p>
+    </div>
+    {% endif %}
+</section>
+
+<!-- ── SERVICIOS ── -->
+{% if servicios %}
+<section class="section section-alt" id="servicios">
+    <div class="section-header">
+        <span class="section-label">Lo que ofrecemos</span>
+        <h2 class="section-title">Servicios & Amenidades</h2>
+        <div class="linea-dorada"><span>✦</span></div>
+    </div>
+    <div class="services-grid">
+        {% for servicio in servicios %}
+        <div class="service-card">
+            <span class="service-icon">{{ servicio.icono }}</span>
+            <div class="service-name">{{ servicio.nombre }}</div>
+            <p class="service-desc">{{ servicio.descripcion }}</p>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+<!-- ── CTA BANNER ── -->
+<section class="cta-banner">
+    <div class="cta-banner-content">
+        <span class="section-label">Disponible 24 horas</span>
+        <h2 class="section-title" style="color:var(--white);">¿Listo para reservar?</h2>
+        <div class="linea-dorada" style="justify-content:center;"><span>✦</span></div>
+        <p style="color:var(--text-muted);font-size:0.95rem;margin-bottom:2.5rem;max-width:500px;margin-left:auto;margin-right:auto;line-height:1.7;">
+            Contáctanos ahora y asegura tu habitación. Atención inmediata por WhatsApp.
+        </p>
+        <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;">
+            {% if config.whatsapp %}
+            <a href="https://wa.me/{{ config.whatsapp }}?text=Hola,%20deseo%20reservar%20una%20habitaci%C3%B3n"
+               target="_blank" class="boton-principal boton-principal-fill">💬 WhatsApp</a>
+            {% endif %}
+            {% if config.telefono %}
+            <a href="tel:{{ config.telefono }}" class="boton-principal">📞 Llamar</a>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+{% endblock %}

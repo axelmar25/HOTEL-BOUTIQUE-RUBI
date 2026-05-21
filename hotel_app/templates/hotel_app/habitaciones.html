@@ -1,0 +1,277 @@
+{% extends 'hotel_app/base.html' %}
+{% load static %}
+
+{% block title %}Habitaciones — {{ config.nombre_hotel }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-hero {
+        height: 40vh; min-height: 300px;
+        background: linear-gradient(135deg, #100d05, #1c1508);
+        display: flex; align-items: center; justify-content: center;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .page-hero::before {
+        content: '';
+        position: absolute; inset: 0;
+        background: radial-gradient(ellipse 60% 80% at 50% 50%, rgba(201,168,76,0.12) 0%, transparent 70%);
+    }
+
+    .page-hero-content { position: relative; z-index: 1; }
+
+    .page-hero h1 {
+        font-family: 'Playfair Display', serif;
+        font-size: clamp(2rem, 5vw, 4rem);
+        color: var(--white);
+    }
+
+    .breadcrumb {
+        font-size: 0.75rem;
+        letter-spacing: 0.15em;
+        color: var(--text-muted);
+        margin-top: 0.8rem;
+    }
+
+    .breadcrumb a { color: var(--gold); text-decoration: none; }
+
+    /* FILTROS */
+    .filter-bar {
+        background: var(--dark2);
+        border-bottom: 1px solid var(--border);
+        padding: 1.2rem 5%;
+        display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;
+    }
+
+    .filter-label {
+        font-size: 0.7rem;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+    }
+
+    .filter-btn {
+        padding: 0.45rem 1.2rem;
+        font-size: 0.72rem;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        border: 1px solid var(--border);
+        background: transparent;
+        color: var(--text-muted);
+        cursor: pointer;
+        text-decoration: none;
+        transition: all 0.3s;
+        font-family: 'Lato', sans-serif;
+    }
+
+    .filter-btn:hover, .filter-btn.active {
+        border-color: var(--gold);
+        color: var(--gold);
+        background: rgba(201,168,76,0.08);
+    }
+
+    /* GRID */
+    .habitaciones-section { padding: 4rem 5%; }
+
+    .hab-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 1px;
+        background: var(--border);
+    }
+
+    .hab-card {
+        background: var(--dark);
+        overflow: hidden;
+        display: block;
+        text-decoration: none;
+        transition: all 0.3s;
+        position: relative;
+    }
+
+    .hab-card:hover { background: var(--dark2); }
+
+    .hab-card-image {
+        aspect-ratio: 16/9;
+        overflow: hidden;
+        position: relative;
+        background: var(--dark3);
+    }
+
+    .hab-card-image img {
+        width: 100%; height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+    }
+
+    .hab-card:hover .hab-card-image img { transform: scale(1.04); }
+
+    .hab-placeholder {
+        width: 100%; height: 100%;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 3.5rem;
+        background: linear-gradient(135deg, #1a1a1a, #2a2010);
+    }
+
+    .hab-card-tipo {
+        position: absolute; top: 1rem; right: 1rem;
+        background: var(--gold);
+        color: var(--dark);
+        font-size: 0.6rem;
+        font-weight: 700;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        padding: 0.3rem 0.7rem;
+    }
+
+    .hab-card-body {
+        padding: 1.5rem;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .hab-card-body h3 {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.3rem;
+        color: var(--white);
+        margin-bottom: 0.7rem;
+    }
+
+    .hab-card-body p {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        line-height: 1.6;
+    }
+
+    .hab-card-features {
+        display: flex; flex-wrap: wrap; gap: 0.5rem;
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .feature-pill {
+        font-size: 0.68rem;
+        color: var(--text-muted);
+        border: 1px solid var(--border);
+        padding: 0.25rem 0.6rem;
+        letter-spacing: 0.05em;
+    }
+
+    .hab-card-footer {
+        padding: 1rem 1.5rem;
+        display: flex; justify-content: space-between; align-items: center;
+    }
+
+    .hab-prices { display: flex; flex-direction: column; gap: 0.15rem; }
+
+    .price-main {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.2rem;
+        color: var(--gold);
+    }
+
+    .price-sub {
+        font-size: 0.72rem;
+        color: var(--text-muted);
+    }
+
+    .hab-ver-btn {
+        font-size: 0.65rem;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--gold);
+        display: flex; align-items: center; gap: 0.4rem;
+        transition: gap 0.3s;
+    }
+
+    .hab-card:hover .hab-ver-btn { gap: 0.8rem; }
+
+    .empty-state {
+        grid-column: 1 / -1;
+        text-align: center;
+        padding: 5rem 2rem;
+        color: var(--text-muted);
+    }
+
+    .empty-state .icon { font-size: 3rem; margin-bottom: 1rem; }
+
+    @media (max-width: 768px) {
+        .hab-grid { grid-template-columns: 1fr; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- PAGE HERO -->
+<section class="page-hero">
+    <div class="page-hero-content">
+        <h1>Nuestras Habitaciones</h1>
+        <div class="linea-dorada" style="justify-content:center;margin-top:0.8rem;"><span>✦</span></div>
+        <div class="breadcrumb">
+            <a href="{% url 'inicio' %}">Inicio</a> &nbsp;/&nbsp; Habitaciones
+        </div>
+    </div>
+</section>
+
+<!-- FILTER BAR -->
+<div class="filter-bar">
+    <span class="filter-label">Filtrar por:</span>
+    <a href="{% url 'habitaciones' %}" class="filter-btn {% if not tipo_seleccionado %}active{% endif %}">Todas</a>
+    <a href="{% url 'habitaciones' %}?tipo=sencilla" class="filter-btn {% if tipo_seleccionado == 'sencilla' %}active{% endif %}">Sencilla</a>
+    <a href="{% url 'habitaciones' %}?tipo=doble" class="filter-btn {% if tipo_seleccionado == 'doble' %}active{% endif %}">Doble</a>
+    <a href="{% url 'habitaciones' %}?tipo=suite" class="filter-btn {% if tipo_seleccionado == 'suite' %}active{% endif %}">Suite</a>
+    <a href="{% url 'habitaciones' %}?tipo=jacuzzi" class="filter-btn {% if tipo_seleccionado == 'jacuzzi' %}active{% endif %}">Jacuzzi</a>
+    <a href="{% url 'habitaciones' %}?tipo=presidencial" class="filter-btn {% if tipo_seleccionado == 'presidencial' %}active{% endif %}">Presidencial</a>
+</div>
+
+<!-- HABITACIONES GRID -->
+<section class="habitaciones-section">
+    <div class="hab-grid">
+        {% for hab in habitaciones %}
+        <a href="{% url 'detalle_habitacion' hab.pk %}" class="hab-card">
+            <div class="hab-card-image">
+                {% if hab.imagen_principal %}
+                <img src="{{ hab.imagen_principal.url }}" alt="{{ hab.nombre }}">
+                {% else %}
+                <div class="hab-placeholder">🛏</div>
+                {% endif %}
+                <span class="hab-card-tipo">{{ hab.get_tipo_display }}</span>
+            </div>
+
+            <div class="hab-card-body">
+                <h3>{{ hab.nombre }}</h3>
+                <p>{{ hab.descripcion|truncatewords:20 }}</p>
+            </div>
+
+            {% if hab.caracteristicas.all %}
+            <div class="hab-card-features">
+                {% for c in hab.caracteristicas.all|slice:":4" %}
+                <span class="feature-pill">{{ c.icono }} {{ c.nombre }}</span>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <div class="hab-card-footer">
+                <div class="hab-prices">
+                    <span class="price-main">${{ hab.precio_noche|floatformat:0 }} MXN</span>
+                    <span class="price-sub">por noche
+                        {% if hab.precio_hora %}· ${{ hab.precio_hora|floatformat:0 }} / hora{% endif %}
+                    </span>
+                </div>
+                <span class="hab-ver-btn">Ver detalles →</span>
+            </div>
+        </a>
+        {% empty %}
+        <div class="empty-state">
+            <div class="icon">🔍</div>
+            <p style="font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--text);">No se encontraron habitaciones</p>
+            <p style="margin-top:0.5rem;font-size:0.85rem;">Prueba con otro filtro</p>
+            <a href="{% url 'habitaciones' %}" class="boton-principal" style="margin-top:1.5rem;">Ver todas</a>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+{% endblock %}

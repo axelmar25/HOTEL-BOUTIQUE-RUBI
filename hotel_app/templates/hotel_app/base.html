@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{{ config.nombre_hotel }}{% endblock %}</title>
+    {% load static %}
+
+    <!-- Google Fonts: Playfair Display + Lato -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            --gold: #C9A84C;
+            --gold-light: #E8C97A;
+            --gold-dark: #9A7A30;
+            --dark: #0E0E0E;
+            --dark2: #1A1A1A;
+            --dark3: #222222;
+            --text: #E8E4DC;
+            --text-muted: #9A9080;
+            --white: #FAF8F3;
+            --border: rgba(201,168,76,0.25);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Lato', sans-serif;
+            background: var(--dark);
+            color: var(--text);
+            font-weight: 300;
+            overflow-x: hidden;
+        }
+
+        /* ── NAVBAR ── */
+        nav {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+            padding: 0 5%;
+            display: flex; align-items: center; justify-content: space-between;
+            height: 75px;
+            background: rgba(14,14,14,0.92);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border);
+            transition: all 0.3s;
+        }
+
+        .logo-navegacion {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            color: var(--gold);
+            text-decoration: none;
+            letter-spacing: 0.05em;
+        }
+
+        .logo-navegacion span {
+            display: block;
+            font-size: 0.6rem;
+            letter-spacing: 0.3em;
+            color: var(--text-muted);
+            font-family: 'Lato', sans-serif;
+            font-weight: 300;
+            text-transform: uppercase;
+        }
+
+        .enlaces-navegacion {
+            display: flex; gap: 2.5rem; list-style: none;
+        }
+
+        .enlaces-navegacion a {
+            color: var(--text);
+            text-decoration: none;
+            font-size: 0.8rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            font-weight: 400;
+            transition: color 0.3s;
+            position: relative;
+        }
+
+        .enlaces-navegacion a::after {
+            content: '';
+            position: absolute; bottom: -4px; left: 0; right: 0;
+            height: 1px; background: var(--gold);
+            transform: scaleX(0);
+            transition: transform 0.3s;
+        }
+
+        .enlaces-navegacion a:hover { color: var(--gold); }
+        .enlaces-navegacion a:hover::after { transform: scaleX(1); }
+
+        .boton-reserva-nav {
+            background: var(--gold);
+            color: var(--dark) !important;
+            padding: 0.6rem 1.5rem;
+            font-weight: 700 !important;
+            font-size: 0.75rem !important;
+            letter-spacing: 0.15em !important;
+        }
+
+        .boton-reserva-nav::after { display: none !important; }
+        .boton-reserva-nav:hover { background: var(--gold-light) !important; color: var(--dark) !important; }
+
+        .menu-hamburguesa {
+            display: none; flex-direction: column; gap: 5px;
+            cursor: pointer; padding: 5px;
+        }
+
+        .menu-hamburguesa span {
+            display: block; width: 25px; height: 1px;
+            background: var(--gold); transition: all 0.3s;
+        }
+
+        /* ── MAIN CONTENT ── */
+        main { padding-top: 75px; }
+
+        /* ── FOOTER ── */
+        footer {
+            background: var(--dark2);
+            border-top: 1px solid var(--border);
+            padding: 4rem 5% 2rem;
+        }
+
+        .contenedor-footer {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 3rem;
+            margin-bottom: 3rem;
+        }
+
+        .marca-footer .logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            color: var(--gold);
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .marca-footer p {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            line-height: 1.7;
+            margin-top: 1rem;
+            max-width: 280px;
+        }
+
+        .columna-footer h4 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1rem;
+            color: var(--gold);
+            margin-bottom: 1.2rem;
+            letter-spacing: 0.05em;
+        }
+
+        .columna-footer ul { list-style: none; }
+
+        .columna-footer ul li {
+            margin-bottom: 0.6rem;
+        }
+
+        .columna-footer ul li a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: color 0.3s;
+        }
+
+        .columna-footer ul li a:hover { color: var(--gold); }
+
+        .item-contacto-footer {
+            display: flex; gap: 0.6rem;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-bottom: 0.8rem;
+            align-items: flex-start;
+        }
+
+        .item-contacto-footer .icon { color: var(--gold); font-size: 1rem; flex-shrink: 0; }
+
+        .parte-inferior-footer {
+            border-top: 1px solid var(--border);
+            padding-top: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .parte-inferior-footer p { color: var(--text-muted); font-size: 0.8rem; }
+
+        .redes-sociales { display: flex; gap: 1rem; }
+
+        .redes-sociales a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.8rem;
+            letter-spacing: 0.1em;
+            transition: color 0.3s;
+        }
+
+        .redes-sociales a:hover { color: var(--gold); }
+
+        /* ── WHATSAPP FLOAT ── */
+        .boton-whatsapp {
+            position: fixed; bottom: 2rem; right: 2rem; z-index: 999;
+            background: #25D366;
+            color: white;
+            width: 58px; height: 58px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.6rem;
+            text-decoration: none;
+            box-shadow: 0 4px 20px rgba(37,211,102,0.4);
+            transition: transform 0.3s;
+            animation: pulse-wa 2s ease-in-out infinite;
+        }
+
+        .boton-whatsapp:hover { transform: scale(1.1); }
+
+        @keyframes pulse-wa {
+            0%, 100% { box-shadow: 0 4px 20px rgba(37,211,102,0.4); }
+            50% { box-shadow: 0 4px 30px rgba(37,211,102,0.7); }
+        }
+
+        /* ── DIVIDER ── */
+        .linea-dorada {
+            display: flex; align-items: center; gap: 1rem;
+            margin: 0.5rem 0 2rem;
+        }
+
+        .linea-dorada::before, .linea-dorada::after {
+            content: ''; flex: 1;
+            height: 1px; background: var(--border);
+        }
+
+        .linea-dorada span {
+            color: var(--gold); font-size: 1rem; flex-shrink: 0;
+        }
+
+        /* ── BUTTONS ── */
+        .boton-principal {
+            display: inline-block;
+            background: transparent;
+            color: var(--gold);
+            border: 1px solid var(--gold);
+            padding: 0.75rem 2rem;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            text-decoration: none;
+            font-family: 'Lato', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .boton-principal:hover {
+            background: var(--gold);
+            color: var(--dark);
+        }
+
+        .boton-principal-fill {
+            background: var(--gold);
+            color: var(--dark);
+        }
+
+        .boton-principal-fill:hover {
+            background: var(--gold-light);
+        }
+
+        /* ── SECTION HEADER ── */
+        .section-header {
+            text-align: center;
+            margin-bottom: 3.5rem;
+        }
+
+        .section-label {
+            font-size: 0.7rem;
+            letter-spacing: 0.35em;
+            text-transform: uppercase;
+            color: var(--gold);
+            font-weight: 700;
+            margin-bottom: 0.8rem;
+            display: block;
+        }
+
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.8rem, 4vw, 3rem);
+            color: var(--white);
+            line-height: 1.2;
+            margin-bottom: 1rem;
+        }
+
+        .section-subtitle {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            max-width: 550px;
+            margin: 0 auto;
+            line-height: 1.7;
+        }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 768px) {
+            .enlaces-navegacion { display: none; }
+            .menu-hamburguesa { display: flex; }
+
+            .contenedor-footer {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .contenedor-footer { grid-template-columns: 1fr; }
+        }
+    </style>
+
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav id="navbar">
+    <a href="{% url 'inicio' %}" class="logo-navegacion">
+        {{ config.nombre_hotel }}
+        <span>Hotel & Suites</span>
+    </a>
+
+    <ul class="enlaces-navegacion">
+        <li><a href="{% url 'inicio' %}">Inicio</a></li>
+        <li><a href="{% url 'habitaciones' %}">Habitaciones</a></li>
+        <!-- <li><a href="#servicios">Servicios</a></li> -->
+        <li><a href="{% url 'contacto' %}">Contacto</a></li>
+        {% if config.whatsapp %}
+        <li><a href="https://wa.me/{{ config.whatsapp }}" target="_blank" class="boton-reserva-nav">Reservar</a></li>
+        {% endif %}
+    </ul>
+
+    <div class="menu-hamburguesa" onclick="toggleMenu()">
+        <span></span><span></span><span></span>
+    </div>
+</nav>
+
+<!-- MOBILE MENU -->
+<div id="mobile-menu" style="
+    display:none; position:fixed; top:75px; left:0; right:0; bottom:0;
+    background: rgba(14,14,14,0.97); z-index:999;
+    flex-direction:column; align-items:center; justify-content:center; gap:2.5rem;
+">
+    <a href="{% url 'inicio' %}" style="color:var(--text);text-decoration:none;font-size:1.3rem;letter-spacing:0.2em;text-transform:uppercase;" onclick="toggleMenu()">Inicio</a>
+    <a href="{% url 'habitaciones' %}" style="color:var(--text);text-decoration:none;font-size:1.3rem;letter-spacing:0.2em;text-transform:uppercase;" onclick="toggleMenu()">Habitaciones</a>
+    <a href="#servicios" style="color:var(--text);text-decoration:none;font-size:1.3rem;letter-spacing:0.2em;text-transform:uppercase;" onclick="toggleMenu()">Servicios</a>
+    <a href="{% url 'contacto' %}" style="color:var(--text);text-decoration:none;font-size:1.3rem;letter-spacing:0.2em;text-transform:uppercase;" onclick="toggleMenu()">Contacto</a>
+    {% if config.whatsapp %}
+    <a href="https://wa.me/{{ config.whatsapp }}" class="boton-principal boton-principal-fill">Reservar Ahora</a>
+    {% endif %}
+</div>
+
+<!-- MAIN -->
+<main>
+    {% block content %}{% endblock %}
+</main>
+
+<!-- FOOTER -->
+<footer>
+    <div class="contenedor-footer">
+        <div class="marca-footer">
+            <span class="logo">{{ config.nombre_hotel }}</span>
+            <div class="linea-dorada" style="margin:1rem 0;max-width:200px;">
+                <span>✦</span>
+            </div>
+            <p>{{ config.descripcion_principal|truncatewords:20 }}</p>
+        </div>
+
+        <div class="columna-footer">
+            <h4>Navegación</h4>
+            <ul>
+                <li><a href="{% url 'inicio' %}">Inicio</a></li>
+                <li><a href="{% url 'habitaciones' %}">Habitaciones</a></li>
+                <li><a href="{% url 'habitaciones' %}?tipo=suite">Suites</a></li>
+                <li><a href="{% url 'habitaciones' %}?tipo=jacuzzi">Jacuzzi</a></li>
+                <li><a href="{% url 'contacto' %}">Contacto</a></li>
+            </ul>
+        </div>
+
+        <div class="columna-footer">
+            <h4>Tipos de Hab.</h4>
+            <ul>
+                <li><a href="{% url 'habitaciones' %}?tipo=sencilla">Sencilla</a></li>
+                <li><a href="{% url 'habitaciones' %}?tipo=doble">Doble</a></li>
+                <li><a href="{% url 'habitaciones' %}?tipo=suite">Suite</a></li>
+                <li><a href="{% url 'habitaciones' %}?tipo=jacuzzi">Jacuzzi</a></li>
+                <li><a href="{% url 'habitaciones' %}?tipo=presidencial">Presidencial</a></li>
+            </ul>
+        </div>
+
+        <div class="columna-footer">
+            <h4>Contacto</h4>
+            {% if config.telefono %}
+            <div class="item-contacto-footer">
+                <span class="icon">📞</span>
+                <span>{{ config.telefono }}</span>
+            </div>
+            {% endif %}
+            {% if config.email %}
+            <div class="item-contacto-footer">
+                <span class="icon">✉</span>
+                <span>{{ config.email }}</span>
+            </div>
+            {% endif %}
+            {% if config.direccion %}
+            <div class="item-contacto-footer">
+                <span class="icon">📍</span>
+                <span>{{ config.direccion }}</span>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="parte-inferior-footer">
+        <p>© {% now "Y" %} {{ config.nombre_hotel }}. Todos los derechos reservados.</p>
+        <div class="redes-sociales">
+            {% if config.facebook %}
+            <a href="{{ config.facebook }}" target="_blank">Facebook</a>
+            {% endif %}
+            {% if config.instagram %}
+            <a href="{{ config.instagram }}" target="_blank">Instagram</a>
+            {% endif %}
+        </div>
+    </div>
+</footer>
+
+<!-- WhatsApp Flotante -->
+{% if config.whatsapp %}
+<a href="https://wa.me/{{ config.whatsapp }}?text=Hola,%20me%20interesa%20conocer%20disponibilidad"
+   class="boton-whatsapp" target="_blank" title="Contáctanos por WhatsApp">
+    💬
+</a>
+{% endif %}
+
+<script>
+    // Navbar scroll effect
+    window.addEventListener('scroll', () => {
+        const nav = document.getElementById('navbar');
+        if (window.scrollY > 50) {
+            nav.style.height = '62px';
+            nav.style.background = 'rgba(10,10,10,0.98)';
+        } else {
+            nav.style.height = '75px';
+            nav.style.background = 'rgba(14,14,14,0.92)';
+        }
+    });
+
+    function toggleMenu() {
+        const m = document.getElementById('mobile-menu');
+        m.style.display = m.style.display === 'flex' ? 'none' : 'flex';
+    }
+</script>
+
+{% block extra_js %}{% endblock %}
+</body>
+</html>

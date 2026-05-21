@@ -1,0 +1,153 @@
+{% extends 'hotel_app/base.html' %}
+
+{% block title %}Contacto — {{ config.nombre_hotel }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-hero {
+        height: 35vh; min-height: 280px;
+        background: linear-gradient(135deg, #100d05, #1c1508);
+        display: flex; align-items: center; justify-content: center;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .page-hero::before {
+        content: '';
+        position: absolute; inset: 0;
+        background: radial-gradient(ellipse 60% 80% at 50% 50%, rgba(201,168,76,0.1) 0%, transparent 70%);
+    }
+
+    .page-hero-content { position: relative; z-index: 1; }
+
+    .page-hero h1 {
+        font-family: 'Playfair Display', serif;
+        font-size: clamp(2rem, 5vw, 3.5rem);
+        color: var(--white);
+    }
+
+    .contacto-section {
+        padding: 5rem 5%;
+        max-width: 900px;
+        margin: 0 auto;
+    }
+
+    .contacto-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 3rem;
+    }
+
+    .contact-block {
+        border: 1px solid var(--border);
+        padding: 2.5rem;
+        background: var(--dark2);
+        text-align: center;
+        transition: all 0.3s;
+    }
+
+    .contact-block:hover {
+        border-color: var(--gold);
+        box-shadow: 0 8px 30px rgba(201,168,76,0.1);
+        transform: translateY(-3px);
+    }
+
+    .contact-block .icon {
+        font-size: 3rem;
+        display: block;
+        margin-bottom: 1.2rem;
+    }
+
+    .contact-block h3 {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.2rem;
+        color: var(--white);
+        margin-bottom: 0.7rem;
+    }
+
+    .contact-block p {
+        color: var(--text-muted);
+        font-size: 0.85rem;
+        margin-bottom: 1.5rem;
+        line-height: 1.6;
+    }
+
+    .contact-block .value {
+        color: var(--gold);
+        font-size: 1rem;
+        display: block;
+        margin-bottom: 1.5rem;
+        font-weight: 700;
+    }
+
+    @media (max-width: 600px) {
+        .contacto-grid { grid-template-columns: 1fr; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<section class="page-hero">
+    <div class="page-hero-content">
+        <h1>Contacto</h1>
+        <div class="linea-dorada" style="justify-content:center;margin-top:0.8rem;"><span>✦</span></div>
+        <p style="color:var(--text-muted);font-size:0.85rem;letter-spacing:0.15em;margin-top:0.5rem;">Estamos disponibles para ti</p>
+    </div>
+</section>
+
+<section class="contacto-section">
+    <div class="section-header">
+        <span class="section-label">Atención 24 horas</span>
+        <h2 class="section-title">¿Cómo podemos ayudarte?</h2>
+        <div class="linea-dorada"><span>✦</span></div>
+        <p class="section-subtitle">Comunícate con nosotros por el canal que prefieras. Respondemos de inmediato.</p>
+    </div>
+
+    <div class="contacto-grid">
+        {% if config.whatsapp %}
+        <div class="contact-block">
+            <span class="icon">💬</span>
+            <h3>WhatsApp</h3>
+            <p>La forma más rápida de reservar o consultar disponibilidad.</p>
+            <span class="value">{{ config.telefono }}</span>
+            <a href="https://wa.me/{{ config.whatsapp }}?text=Hola,%20quisiera%20informes"
+               target="_blank" class="boton-principal boton-principal-fill">Enviar mensaje</a>
+        </div>
+        {% endif %}
+
+        {% if config.telefono %}
+        <div class="contact-block">
+            <span class="icon">📞</span>
+            <h3>Teléfono</h3>
+            <p>Llámanos directamente para atención inmediata.</p>
+            <span class="value">{{ config.telefono }}</span>
+            <a href="tel:{{ config.telefono }}" class="boton-principal">Llamar ahora</a>
+        </div>
+        {% endif %}
+
+        {% if config.email %}
+        <div class="contact-block">
+            <span class="icon">✉️</span>
+            <h3>Correo electrónico</h3>
+            <p>Escríbenos y te responderemos a la brevedad.</p>
+            <span class="value">{{ config.email }}</span>
+            <a href="mailto:{{ config.email }}" class="boton-principal">Enviar correo</a>
+        </div>
+        {% endif %}
+
+        {% if config.direccion %}
+        <div class="contact-block">
+            <span class="icon">📍</span>
+            <h3>Ubicación</h3>
+            <p>Encuéntranos en:</p>
+            <span class="value" style="font-size:0.9rem;">{{ config.direccion }}</span>
+            <a href="https://maps.google.com/?q={{ config.direccion|urlencode }}"
+               target="_blank" class="boton-principal">Ver en mapa</a>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+{% endblock %}
